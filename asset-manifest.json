@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/web_base_polres/static/css/main.c5f82bf0.chunk.css",
+    "main.js": "/web_base_polres/static/js/main.ba8f846b.chunk.js",
+    "main.js.map": "/web_base_polres/static/js/main.ba8f846b.chunk.js.map",
+    "runtime-main.js": "/web_base_polres/static/js/runtime-main.7b456813.js",
+    "runtime-main.js.map": "/web_base_polres/static/js/runtime-main.7b456813.js.map",
+    "static/js/2.013fa870.chunk.js": "/web_base_polres/static/js/2.013fa870.chunk.js",
+    "static/js/2.013fa870.chunk.js.map": "/web_base_polres/static/js/2.013fa870.chunk.js.map",
+    "index.html": "/web_base_polres/index.html",
+    "static/css/main.c5f82bf0.chunk.css.map": "/web_base_polres/static/css/main.c5f82bf0.chunk.css.map",
+    "static/js/2.013fa870.chunk.js.LICENSE.txt": "/web_base_polres/static/js/2.013fa870.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.7b456813.js",
+    "static/js/2.013fa870.chunk.js",
+    "static/css/main.c5f82bf0.chunk.css",
+    "static/js/main.ba8f846b.chunk.js"
+  ]
+}
