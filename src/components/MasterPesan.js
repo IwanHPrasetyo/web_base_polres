@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import * as firebase from "firebase";
+import moment from "moment";
 const MasterPesan = () => {
   const script = document.createElement("script");
   const [id, setId] = useState();
   const [idPolisi, setIdPolisi] = useState();
   const [jenisKriminal, setJenisKriminal] = useState();
   const [kriminal, setKriminal] = useState([]);
+  const [dataChat, setDataChat] = useState([]);
   const [emailLogin, setEmailLogin] = useState();
   const [namaLogin, setNamaLogin] = useState();
   const [dataPesan, setDataPesan] = useState([]);
@@ -28,6 +30,7 @@ const MasterPesan = () => {
 
   const resetData = () => {
     setJenisKriminal("");
+    setDataChat([]);
   };
   const dataDetail = (item) => {
     setId(item.id);
@@ -48,7 +51,7 @@ const MasterPesan = () => {
 
   const selectData = async () => {
     let idUser = await localStorage.getItem("polsekId");
-    setIdPolisi(idUser);
+    await setIdPolisi(idUser);
 
     const todoList = [];
     const listUser = [];
@@ -63,15 +66,11 @@ const MasterPesan = () => {
           return item === todos[id].pegirim;
         });
 
-        if (dataId.length === 0) {
+        if (dataId.length === 0 && todos[id].pegirim != idUser) {
           idPengirim.push(todos[id].pegirim);
           todoList.push({ id, ...todos[id] });
         }
       }
-
-      console.log("datanya");
-
-      console.log(idPengirim);
 
       setDataPesan(todoList);
 
@@ -85,32 +84,55 @@ const MasterPesan = () => {
   };
 
   const seletDetailPesan = async (item) => {
-    console.log(item);
+    const database = firebase.database();
+    const todoList = [];
+    const idPengirim = [];
+
+    const todoRef = database.ref("Message").child(item.pegirim);
+
+    await todoRef.on("value", async (snapshot) => {
+      const todos = snapshot.val();
+      for (let id in todos) {
+        if (todos[id].pegirim == idPolisi || todos[id].penerima == idPolisi) {
+          todoList.push({ id, ...todos[id] });
+        }
+      }
+    });
+    console.log(todoList);
+    setDataChat(todoList);
   };
 
   const kirmPesan = async () => {
-    console.log("kirim pesan");
-    console.log(pesan);
+    const namaKantor = await localStorage.getItem("nama");
+    if (pesan.length != 0) {
+      let data = {
+        pegirim: idPolisi,
+        namaPelapor: dataChat[0].namaPelapor,
+        pesan: pesan,
+        penerima: dataChat[0].pegirim,
+        namaPolsek: namaKantor,
+        waktu: moment().format("YYYY-MM-DD HH:mm:ss"),
+      };
+      const pengirim = await firebase
+        .database()
+        .ref(`Message/${idPolisi}/${Date.now()}`);
+
+      const penerima = await firebase
+        .database()
+        .ref(`Message/${dataChat[0].pegirim}/${Date.now()}`);
+
+      pengirim.set(data).then(() => {
+        penerima.set(data).then(() => {
+          console.log("kirim pesan");
+          console.log(data);
+          setPesan("");
+          setDataChat([]);
+        });
+      });
+    } else {
+      console.log("gagal");
+    }
   };
-
-  // const selectDataUser = async (idPengirim) => {
-  //   const dataUser = [];
-
-  //   for (let i = 0; i < idPengirim.length; i++) {
-  //     const todoRef = await firebase
-  //       .database()
-  //       .ref("DataPolapor")
-  //       .child(idPengirim[i]);
-
-  //     todoRef.on("value", async (snapshot) => {
-  //       const todos = snapshot.val();
-  //       for (let id in todos) {
-  //         dataUser.push(todos);
-  //       }
-  //     });
-  //   }
-  //   console.log(dataUser);
-  // };
 
   return (
     <div>
@@ -228,44 +250,59 @@ const MasterPesan = () => {
                       <div className="card-body">
                         <div className="direct-chat-messages">
                           {/* chat */}
-                          <div className="direct-chat-msg">
-                            <div className="direct-chat-infos clearfix">
-                              <span className="direct-chat-name float-left">
-                                Alexander Pierce
-                              </span>
-                              <span className="direct-chat-timestamp float-right">
-                                23 Jan 2:00 pm
-                              </span>
-                            </div>
-                            <img
-                              className="direct-chat-img"
-                              src="dist/img/user1-128x128.jpg"
-                              alt="message user image"
-                            />
-                            <div className="direct-chat-text">
-                              Is this template really for free? That's
-                              unbelievable!
-                            </div>
-                          </div>
+                          {dataChat.map((item) => {
+                            if (
+                              item.pegirim != idPolisi &&
+                              item.penerima == idPolisi
+                            ) {
+                              return (
+                                <>
+                                  <div className="direct-chat-msg right">
+                                    <div className="direct-chat-infos clearfix">
+                                      <span className="direct-chat-name float-right">
+                                        {item.namaPelapor}
+                                      </span>
+                                      <span className="direct-chat-timestamp float-left">
+                                        {item.waktu}
+                                      </span>
+                                    </div>
+                                    <img
+                                      className="direct-chat-img"
+                                      src={`https://ui-avatars.com/api/?size=256&name=${item.namaPelapor}&background=random`}
+                                      alt="message user image"
+                                    />
+                                    <div className="direct-chat-text">
+                                      {item.pesan}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            } else {
+                              return (
+                                <>
+                                  <div className="direct-chat-msg">
+                                    <div className="direct-chat-infos clearfix">
+                                      <span className="direct-chat-name float-left">
+                                        {namaLogin}
+                                      </span>
+                                      <span className="direct-chat-timestamp float-right">
+                                        {item.waktu}
+                                      </span>
+                                    </div>
+                                    <img
+                                      className="direct-chat-img"
+                                      src={`https://ui-avatars.com/api/?size=256&name=${namaLogin}&background=random`}
+                                      alt="message user image"
+                                    />
+                                    <div className="direct-chat-text">
+                                      {item.pesan}
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            }
+                          })}
 
-                          <div className="direct-chat-msg right">
-                            <div className="direct-chat-infos clearfix">
-                              <span className="direct-chat-name float-right">
-                                Sarah Bullock
-                              </span>
-                              <span className="direct-chat-timestamp float-left">
-                                23 Jan 2:05 pm
-                              </span>
-                            </div>
-                            <img
-                              className="direct-chat-img"
-                              src="dist/img/user3-128x128.jpg"
-                              alt="message user image"
-                            />
-                            <div className="direct-chat-text">
-                              You better believe it!
-                            </div>
-                          </div>
                           {/* chat */}
                         </div>
                         <div className="card-footer">

@@ -11,6 +11,7 @@
     "leaflet": "^1.4.0",
     "leaflet-routing-machine": "^3.2.12",
     "mapbox-gl": "^1.11.1",
+    "moment": "^2.29.1",
     "next": "^10.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
