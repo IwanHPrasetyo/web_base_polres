@@ -28,6 +28,8 @@ const MasterLaporan = () => {
   const [tanggal, setTanggal] = useState();
   const [kriminal, setKriminal] = useState([]);
   const [laporan, setLaporan] = useState([]);
+  const [dataDetail, setDataDetail] = useState([]);
+  const [selectDetail, setSelectDetail] = useState();
   const [emailLogin, setEmailLogin] = useState();
   const [namaLogin, setNamaLogin] = useState();
 
@@ -39,15 +41,6 @@ const MasterLaporan = () => {
   }, []);
 
   const simpanData = async () => {
-    // console.log(noLaporan);
-    // console.log(nomerId);
-    // console.log(namaPelapor);
-    // console.log(telfon);
-    // console.log(jenisKriminal);
-    // console.log(kronologi);
-    // console.log(status);
-    // console.log(tanggal);
-
     firebase.database().ref("DataLaporan").child(noLaporan).set({
       noLaporan,
       nomerId,
@@ -83,6 +76,17 @@ const MasterLaporan = () => {
       script.src = "js/content.js";
       script.async = true;
       document.body.appendChild(script);
+    });
+  };
+
+  const selectDataDetail = async (item) => {
+    console.log(item);
+    await setDataDetail(item);
+  };
+
+  const simpanDetail = async (item) => {
+    firebase.database().ref("DataLaporan").child(dataDetail.noLaporan).update({
+      status: selectDetail,
     });
   };
 
@@ -197,6 +201,9 @@ const MasterLaporan = () => {
                                   className="btn btn-block btn-primary btn-sm"
                                   data-toggle="modal"
                                   data-target="#modal-detail"
+                                  onClick={() => {
+                                    selectDataDetail(item);
+                                  }}
                                 >
                                   Detail
                                 </button>
@@ -241,6 +248,85 @@ const MasterLaporan = () => {
                       <span aria-hidden="true">×</span>
                     </button>
                   </div>
+                  <div className="modal-body">
+                    <div className="card-body">
+                      <div className="form-group">
+                        <label htmlFor="exampleInputEmail1">Nama Pelapor</label>
+                        <input
+                          type="text"
+                          disabled={true}
+                          value={dataDetail.namaPelapor}
+                          className="form-control"
+                          id="exampleInputEmail1"
+                          placeholder="Nama Pelapor"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="exampleInputPassword1">
+                          Nama Polsek
+                        </label>
+                        <input
+                          type="text"
+                          disabled={true}
+                          value={dataDetail.namaPolse}
+                          className="form-control"
+                          id="exampleInputPassword1"
+                          placeholder="Nama Polsek"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="exampleInputPassword1">
+                          Nama Laporan
+                        </label>
+                        <input
+                          type="text"
+                          disabled={true}
+                          value={dataDetail.namaLaporan}
+                          className="form-control"
+                          id="exampleInputPassword1"
+                          placeholder="Nama Laporan"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Status</label>
+                        <select
+                          onChange={(data) => {
+                            setSelectDetail(data.target.value);
+                          }}
+                          className="form-control select2 select2-hidden-accessible"
+                          style={{ width: "100%" }}
+                          aria-hidden="true"
+                        >
+                          <option
+                            selected={
+                              dataDetail.status == "Proses" ? true : false
+                            }
+                            data-select2-id={1}
+                          >
+                            Proses
+                          </option>
+                          <option
+                            selected={
+                              dataDetail.status == "Selesai" ? true : false
+                            }
+                            data-select2-id={2}
+                          >
+                            Selesai
+                          </option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label>Kronologi</label>
+                        <textarea
+                          class="form-control"
+                          disabled={true}
+                          rows="3"
+                          value={dataDetail.kronologi}
+                          placeholder="Kronologi"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
                   <div className="modal-footer justify-content-between">
                     <button
                       type="button"
@@ -249,8 +335,15 @@ const MasterLaporan = () => {
                     >
                       Close
                     </button>
-                    <button type="button" className="btn btn-primary">
-                      Save changes
+                    <button
+                      onClick={() => {
+                        simpanDetail();
+                      }}
+                      data-dismiss="modal"
+                      type="button"
+                      className="btn btn-primary"
+                    >
+                      Simpan
                     </button>
                   </div>
                 </div>
