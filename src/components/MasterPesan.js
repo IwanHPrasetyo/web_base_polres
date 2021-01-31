@@ -98,7 +98,6 @@ const MasterPesan = () => {
         }
       }
     });
-    console.log(todoList);
     setDataChat(todoList);
   };
 
@@ -124,9 +123,9 @@ const MasterPesan = () => {
       pengirim.set(data).then(() => {
         penerima.set(data).then(() => {
           console.log("kirim pesan");
-          console.log(data);
+          // console.log(data);
           setPesan("");
-          setDataChat([]);
+          // setDataChat([]);
         });
       });
     } else {
@@ -312,6 +311,7 @@ const MasterPesan = () => {
                                 onChange={(data) => {
                                   setPesan(data.target.value);
                                 }}
+                                value={pesan}
                                 type="text"
                                 name="message"
                                 placeholder="Type Message ..."
